@@ -94,7 +94,7 @@ class MainVisitor(c_ast.NodeVisitor, Handler):
 									break
 							elif '/*' in line:
 								count_closing_brackets += 1
-					if keys[0]:
+					if keys:
 						link = keys[0]['values'][0]
 					else:
 						link = ''
