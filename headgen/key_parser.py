@@ -88,11 +88,19 @@ class KeyParser():
 				else:
 					res.append(found)
 		return res
-
-
-	def get_all_values(self, keys):
+	'''
+	@brief Gets all values from list of keys
+	@param[in] keys list of keys
+	@return list of values
+	'''
+	def get_all_values(self, keys:List[dict]) -> List:
 		all_values = sum([_['values'] for _ in keys], [])
 		return all_values
 
-	def get_all_commands(self, keys):
+	'''
+	@brief Gets all commands from list of keys
+	@param[in] keys  list of keys
+	@return list of commands
+	'''
+	def get_all_commands(self, keys:List[dict]) -> List:
 		return [_['command'] for _ in keys]

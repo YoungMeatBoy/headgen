@@ -132,6 +132,11 @@ class FileFilter:
 				res.append(file)
 		return res
 
+	'''
+	@brief Removes empty files from a list
+	@param[in] files list of files
+	@return filtered list of files
+	'''
 	def remove_empty_files(self, files:List[str]) -> List[str]:
 		#import os
 		for file in files:

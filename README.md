@@ -9,7 +9,14 @@ pip3 install headgen
 ```bash
 python -m headgen
 ```
-
+# Ignoring files
+You need to place file '.headignore' file in any sub directory
+There you can place patterns patterns of ignoring files (same as gitignore patterns)
+Example:
+```
+main.c
+*hello.c
+```
 # Flags
 
 | flag                    | using                                         | default           |
