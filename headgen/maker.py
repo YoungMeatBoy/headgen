@@ -33,10 +33,6 @@ class Maker:
 		# reverse -> replace -> replace
 		header_path = file[::-1].replace('c.', 'h.', 1)[::-1]
 		
-		# visiting ast
-		ast = self.main_visitor.get_ast(file)
-		self.main_visitor.visit(ast)
-
 		# taking all functions
 		functions = self.main_visitor.get_functions(file)
 		

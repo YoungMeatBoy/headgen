@@ -72,7 +72,11 @@ else:
 		controller.locked_print('[PROCESSING]')
 		for file in files:
 			controller.locked_print(f'     ➾  {file}')
-			maker.create_header(file)
+			try:
+				maker.create_header(file)
+			except Exception as e:
+				raise e
+				
 		controller.locked_print()
 	
  

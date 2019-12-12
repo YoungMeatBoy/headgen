@@ -1,67 +1,29 @@
-from headgen.helper_visitor import Handler
+from headgen.helper_visitor import HelperVisitor
 from headgen.key_parser import KeyParser
 from pycparser import c_ast
 from typing import List
 import re
 
-class MainVisitor(c_ast.NodeVisitor, Handler):
+def get_function_name(func):
+	return ''.join(func.split('(')[0]).split().pop()
+
+class MainVisitor(c_ast.NodeVisitor, HelperVisitor):
 
 	def __init__(self, controller):
-		self.cache_functions = []
-		self.cache_structures = []
-		self.cache_enums = []
-		self.cache_typedefs = []
 		self.key_parser = KeyParser()
 		self.controller = controller
 
-	'''
-	@brief visiting defenition of the function
-	@paramp[in] node node to be searched
-	'''
-	def visit_FuncDef(self, node):
-		function = self.handle_function(node)
-		self.cache_functions.append(function)
-	
-	'''
-	@brief visiting defenition of the structure
-	@paramp[in] node node to be searched
-	'''
-	def visit_Struct(self, node):
-		structure = self.handle_structure(node)
-		self.cache_structures.append(structure)
-
-	'''
-	@brief visiting defenition of the typedef
-	@paramp[in] node node to be searched
-	'''
-	def visit_Typedef(self, node):
-		tpdef = self.handle_typedef(node)
-		self.cache_typedefs.append(tpdef)
-	
-	'''
-	@brief visiting defenition of the enum
-	@paramp[in] node node to be searched
-	'''
-	def visit_Enum(self, node):
-		enum = self.handle_enum(node)
-		self.cache_enums.append(enum)
-
-	'''
-	@brief get all structures
-	@return list
-	'''
-	def get_structures(self) -> List:
-		return self.cache_structures
-
-	def __get_enums__(self) -> List:
-		return self.cache_enums
-	
-	def get_typedefs(self) -> List:
-		return self.cache_typedefs
-
 	def get_functions(self, filename):
+		self.cache_functions = []
+		pt = re.compile(r'\w{0,}\s?\w{0,}\s?[*]?(\w.*)[(](.*)[)]\s?{?')
+		with open(filename, 'r') as f:
+			for ind, line in enumerate(f):
+				if re.match(pt, line):
+					name = get_function_name(line)
+					self.cache_functions.append({'name' : name, 'coordinates' : {'line' : ind + 1, 'start' : 0}, 'documentation' : '', 'line' : line})
+			
 		for function in self.cache_functions:
-			line = self.get_line_from_file(filename, function['coordinates']['line'])
+			line = function['line']
 			if 'headgen::no_add' in line:
 				self.cache_functions.remove(function)
 			function['signature'] = self.get_function_signature(line)
