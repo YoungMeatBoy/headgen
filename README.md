@@ -92,7 +92,7 @@ int sum_three(int a, int b, int c);
 
 ## Includes
 ```c
-/* headgen::includes::
+/* headgen::includes
 std: stdio.h
 std: string.h
 loc: mylib.h
@@ -141,7 +141,7 @@ All defines are placed after includes by default.
 You can set some defines to be stored before includes
 
 ```
-/* headgen::includes::
+/* headgen::includes
 std: stdio.h
 */
 

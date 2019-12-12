@@ -27,9 +27,8 @@ class KeyParser():
 		# Pattern which matches 
 		# such lines:
 		# 	any::any
-		#   any::any::
 		#   any::any::any
-		self.pattern = r'\w{1,}[:][:]\w{1,}[:][:]\w{0,}'
+		self.pattern = r'\w{1,}[:][:]\w{1,}([:][:]\w{1,})?'
 		self.cmp_ptrn = re.compile(self.pattern)
 	
 	'''
@@ -38,8 +37,11 @@ class KeyParser():
 	@return found matches
 	'''
 	def __match__(self, line:str) -> List[str]:
-		matched = re.findall(self.cmp_ptrn, line)
-		return matched
+		matched = re.search(self.cmp_ptrn, line)
+		if matched:
+			return [matched.group()]
+		else:
+			return []
 
 	'''
 	@brief Finds all keys in the line

@@ -36,7 +36,7 @@ class MainVisitor(c_ast.NodeVisitor, HelperVisitor):
 					doc = ''
 					start_comment_line_number = ind
 					count_closing_brackets = 0
-					keys = self.key_parser.get_keys_of(line, 'headgen')
+					keys = self.key_parser.get_keys_of(line, 'headgen', 'link')
 					doc += self.key_parser.remove_keys_from_line(line)
 					while True:
 						try:
