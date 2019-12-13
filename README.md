@@ -1,4 +1,5 @@
 # C99 Headers Generator
+[![CodeFactor](https://www.codefactor.io/repository/github/youngmeatboy/headgen/badge)](https://www.codefactor.io/repository/github/youngmeatboy/headgen)
 
 # Installation
 ```bash
