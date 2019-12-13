@@ -42,9 +42,6 @@ class Maker:
 		#taking protection
 		protection = self.string_worker.get_protection(header_path)
 		
-		# taking info
-		info = self.string_worker.get_info(file, functions = functions)
-  
 		includes, sort_includes = self.main_visitor.get_includes(file)
 		includes = self.main_visitor.prettify_includes(includes, sort_includes)
 
@@ -53,7 +50,9 @@ class Maker:
 
 		structures = self.main_visitor.get_structures(file)
 		enums = self.main_visitor.get_enums(file)
-  
+
+		info = self.string_worker.get_info(file, functions, structures, enums)
+
 
 		with open(header_path, 'w') as header:
 			# writing info

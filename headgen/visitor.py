@@ -4,91 +4,126 @@ from pycparser import c_ast
 from typing import List
 import re
 
-def get_function_name(func):
-	return ''.join(func.split('(')[0]).split().pop()
+'''
+@brief Takes function name from line
+@param[in] line line to be parsed
+@return str name of the function
+'''
+def get_function_name(line):
+	before_brace = line.split('(')[0]
+	name = before_brace.split().pop()
+	return name
+
+
 
 class MainVisitor(c_ast.NodeVisitor, HelperVisitor):
-
 	def __init__(self, controller):
 		self.key_parser = KeyParser()
 		self.controller = controller
+		self.function_pattern = re.compile(r'\w{0,}\s?\w{0,}\s?[*]?(\w.*)[(](.*)[)]\s?{?')
+		self.include_pattern = re.compile(r'(loc|std)?\s*[:]\s*\w{1,}[.][h]')
 
-	def get_functions(self, filename):
-		self.cache_functions = []
-		pt = re.compile(r'\w{0,}\s?\w{0,}\s?[*]?(\w.*)[(](.*)[)]\s?{?')
-		with open(filename, 'r') as f:
-			for ind, line in enumerate(f):
-				if re.match(pt, line):
-					name = get_function_name(line)
-					self.cache_functions.append({'name' : name, 'coordinates' : {'line' : ind + 1, 'start' : 0}, 'documentation' : '', 'line' : line})
-			
-		for function in self.cache_functions:
-			line = function['line']
-			if 'headgen::no_add' in line:
-				self.cache_functions.remove(function)
-			function['signature'] = self.get_function_signature(line)
-		return self.cache_functions
+	'''
+	@brief Checks if line is a function
+	@param[in] line line to be parsed
+	@return bool
+	'''
+	def __is_function__(self, line:str) -> bool:
+		return re.match(self.function_pattern, line)
 
-	def get_documentation(self, file, functions):
-		with open(file, 'r') as opened_file:
+	'''
+	@brief Checks if line is not ignored
+	@param [in] line line to be parsed
+	@return bool
+	'''
+	def __not_ignored__(self, line) -> bool:
+		return 'headgen::no_add' not in line
+	
+	'''
+	@brief Gets all functions from file
+	@param [in] filename file to be readed
+	@return list of functions
+	'''
+	def get_functions(self, filename:str) -> List[dict]:
+		result = list()
+		with open(filename) as opened_file:
 			for ind, line in enumerate(opened_file):
-				if '/*' in line:
-					doc = ''
+				if self.__is_function__(line) and self.__not_ignored__(line):
+					name = get_function_name(line)
+					info = {
+						'name' : name,
+						'signature' : self.get_function_signature(line),
+						'documentation' : ''
+					}
+					result.append(info)
+		return result
+
+	'''
+	@brief links documentation from file with functions
+	@param[in]  filename file to be parsed
+	@param[in] list of functions
+	@return list of functions linked with documentation
+	'''
+	def get_documentation(self, filename:str, functions:List[dict]):
+		with open(filename) as opened_file:
+			for ind, line in enumerate(opened_file):
+				keys = self.key_parser.get_keys_of(line, 'headgen', 'link')
+				no_keys_line = self.key_parser.remove_keys_from_line(line)
+				if keys:
+					doc = no_keys_line
 					start_comment_line_number = ind
-					count_closing_brackets = 0
-					keys = self.key_parser.get_keys_of(line, 'headgen', 'link')
-					doc += self.key_parser.remove_keys_from_line(line)
+					
 					while True:
 						try:
 							line = next(opened_file)
+							if '*/' in line:
+								doc += line
+								break
+							else:
+								doc += line
 						except StopIteration:
 							reason = {
-								'message': 'Impossible to find documentation fo functions',
+								'message': 'Impossible to find documentation for functions',
 								'reason' : f'Unclosed bracket stored at line {start_comment_line_number}'
 							}
 							self.controller.finish(**reason)
-						else:
-							doc += line
-							if '*/' in line:
-								if count_closing_brackets:
-									count_closing_brackets -= 1	
-								else:
-									break
-							elif '/*' in line:
-								count_closing_brackets += 1
-					if keys:
-						link = keys[0]['values'][0]
-					else:
-						link = ''
+					link_name = self.key_parser.get_all_values(keys).pop()
+					
 					for func in functions:
-						if link == func['name']:
+						if link_name == func['name']:
 							func['documentation'] = doc
+		return functions
 
-	def get_includes(self, file:str):
-		res = []	
-		sort_flag:bool = False
-		with open(file, 'r') as opened_file:
+	def __is_include__(self, line:str):
+		return re.match(self.include_pattern, line)
+	
+	def get_includes(self, filename:str):
+		res = list()	
+		sort_flag = False
+		with open(filename) as opened_file:
 			for line_ind, line in enumerate(opened_file):
-				keys = self.key_parser.get_keys_of(line, 'headgen')
-				if keys:
-					if 'includes' in [_['command'] for _ in keys]:
-						sort_flag = 'enable' in sum([com['values'] for com in keys], [])
-						while True:
-							try:
-								line = next(opened_file)
-							except StopIteration:
-								reason = {
-											'message' : 'Impossible to create header!',
-											'reason'  : f'Could not read includes as comment at line {line_ind} is not closed!'
-										}
-								self.controller.finish(**reason)
+				keys_includes = self.key_parser.get_keys_of(line, 'headgen', 'includes')
+				keys_sort = self.key_parser.get_keys_of(line, 'headgen', 'sort')
+				if keys_includes:
+					if keys_sort:
+						sort_flag = keys_sort['values'].pop() == 'enable'
+					while True:
+						try:
+							line = next(opened_file)
+							if '*/' in line:
+								break
 							else:
-								if '*/' in line:
-									break
-								else:
-									if 'loc' in line or 'std' in line:
-										typ, name = line.split(':')
-										res.append({'type' : typ, 'headername' : name.strip()})
+								if self.__is_include__(line):
+									typ, name = line.split(':')
+									res.append({'type' : typ.strip(), 
+												'headername' : name.strip()
+												})
+						except StopIteration:
+							reason = {
+									'message' : 'Impossible to create header!',
+									'reason'  : f'Could not read includes as comment at line {line_ind} is not closed!'
+								}
+							self.controller.finish(**reason)
 		return res, sort_flag
 
 	def get_defines(self, file:str):
@@ -97,42 +132,39 @@ class MainVisitor(c_ast.NodeVisitor, HelperVisitor):
 		with open(file, 'r') as opened_file:
 			for line in opened_file:
 				if '#define' in line:
-					keys = self.key_parser.get_keys_of(line, 'headgen')
-					if keys:
-						if 'no_add' not in [_['command'] for _ in keys]:
-							if 'includes' in sum([_['values'] for _ in keys], []):
-								before.append(self.key_parser.remove_keys_from_line(line).strip())
-							else:
-								after.append(self.key_parser.remove_keys_from_line(line).line.strip())
-					else:
-						after.append(self.key_parser.remove_keys_from_line(line).strip())
+					add_flag = not self.key_parser.get_keys_of(line, 'headgen', 'no_add')
+					no_keys_line = self.key_parser.remove_keys_from_line(line).strip().lstrip('//')
+					if add_flag:
+						place_setted = self.key_parser.get_keys_of(line, 'headgen', 'place_before')
+						if place_setted and place_setted['values'] and 'includes' in place_setted['values']:
+							before.append(no_keys_line)
+						else:
+							after.append(no_keys_line)
 		return before, after
 
 	def get_enums(self, file):
 		res = []
 		with open(file, 'r') as opened_file:
 			for ind, line in enumerate(opened_file):
-				keys = self.key_parser.get_keys_of(line, 'headgen')
-				all_commands = self.key_parser.get_all_commands(keys)
-				all_values = self.key_parser.get_all_values(keys)
+				watch = self.key_parser.get_keys_of(line, 'headgen', 'watch')
 				line_num = ind
-				if 'watch' in all_commands:
-					if 'enum' in all_values:
+				if watch:
+					watch = watch.pop()
+					if 'enum' in watch['values']:
 						en = ''
 						while True:
 							try:
 								line = next(opened_file)
-							except StopIteration:
-								reason = {
-									'message' : 'Impossible to create header!',
-									'reason'  : f'Comment on line {line_num} is nt closed!'
-								}
-								self.controller.finish(**reason)
-							else:
 								if '*/' in line:
 									break
 								else:
 									en += line
+							except StopIteration:
+								reason = {
+									'message' : 'Impossible to create header!',
+									'reason'  : f'Comment on line {line_num} is not closed!'
+								}
+								self.controller.finish(**reason)
 						res.append(en)
 		return res
 
@@ -140,26 +172,24 @@ class MainVisitor(c_ast.NodeVisitor, HelperVisitor):
 		res = []
 		with open(file, 'r') as opened_file:
 			for ind, line in enumerate(opened_file):
-				keys = self.key_parser.get_keys_of(line, 'headgen')
-				all_commands = self.key_parser.get_all_commands(keys)
-				all_values = self.key_parser.get_all_values(keys)
+				watch = self.key_parser.get_keys_of(line, 'headgen', 'watch')
 				line_num = ind
-				if 'watch' in all_commands:
-					if 'struct' in all_values:
-						en = ''
+				if watch:
+					watch = watch.pop()
+					if 'struct' in watch['values']:
+						st = ''
 						while True:
 							try:
 								line = next(opened_file)
-							except StopIteration:
-								reason = {
-									'message' : 'Impossible to create header!',
-									'reason'  : f'Comment on line {line_num} is nt closed!'
-								}
-								self.controller.finish(**reason)
-							else:
 								if '*/' in line:
 									break
 								else:
-									en += line
-						res.append(en)
+									st += line
+							except StopIteration:
+								reason = {
+									'message' : 'Impossible to create header!',
+									'reason'  : f'Comment on line {line_num} is not closed!'
+								}
+								self.controller.finish(**reason)
+						res.append(st)
 		return res
