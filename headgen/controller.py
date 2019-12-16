@@ -76,7 +76,7 @@ class Controller(object):
 	def ask_to_continue(self) -> bool:
 		if self.ask_flag:
 			accept = ("y", "yes", "")
-			self.locked_print(red("[ANSWER TO CONTINUE] ", end=""))
+			self.locked_print(red("[ANSWER TO CONTINUE] "), end="")
 			try:
 				res = input().lower() in accept
 			except KeyboardInterrupt:
