@@ -9,7 +9,6 @@ from headgen.file_filter import FileFilter
 from headgen.maker import Maker
 from colors import *
 from colorama import init
-import tableprint
 init()
 
 
