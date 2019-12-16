@@ -12,19 +12,13 @@
 '''
 
 import datetime
+from colors import *
 
-
-'''
-This class keeps useful functions
-I wrote it for keeping all needful
-functions together (some of them)
-uses other functions from this module
-
-'''
 class Controller(object):
 	def __init__(self, print_flag:bool = True, ask_flag:bool = True) -> None:
 		self.print_flag = print_flag
 		self.ask_flag = ask_flag
+		self.assert_printing = print_flag
 	
 	'''
 	@brief Incapsulation of a standard print
@@ -41,10 +35,10 @@ class Controller(object):
 	@warning Exits the programm!
 	'''
 	def finish(self, message:str, reason:str=None) -> None:
-		self.locked_print('\n[EXIT PROGRAM] [WATCH INFO]')
-		self.locked_print(f'[MESSAGE] : {message}')
+		self.locked_print(red('\n[EXIT PROGRAM] [WATCH INFO]'))
+		self.locked_print(red(f'[MESSAGE] : {message}'))
 		if reason:
-			self.locked_print(f'[REASON]  : {reason}')
+			self.locked_print(red(f'[REASON]  : {reason}'))
 		exit(1)
 	
 	'''
@@ -54,9 +48,9 @@ class Controller(object):
 	@warning Exits the programm!
 	'''
 	def success(self, message:str=None, *args, **kwargs) -> None:
-		self.locked_print('\n[PROGRAM FINISHED]')
+		self.locked_print(green('\n[PROGRAM FINISHED]'))
 		if message:
-			self.locked_print(f'[MESSAGE] : {message}', *args, **kwargs)
+			self.locked_print(green(f'[MESSAGE] : {message}', *args, **kwargs))
 		exit()
 	
 	'''
@@ -82,7 +76,7 @@ class Controller(object):
 	def ask_to_continue(self) -> bool:
 		if self.ask_flag:
 			accept = ("y", "yes", "")
-			self.locked_print("[ANSWER TO CONTINUE] ", end="")
+			self.locked_print(red("[ANSWER TO CONTINUE] ", end=""))
 			try:
 				res = input().lower() in accept
 			except KeyboardInterrupt:

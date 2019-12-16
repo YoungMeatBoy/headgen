@@ -44,9 +44,6 @@ class FileWorker:
 	'''
 	def find_files(self, directory:str, filtering_filename:str=None) -> List[str]:
 		self.check_directory(directory)
-		self.controller.locked_print(f'\n[DIRECTORY OF SEARCHING] :\n     ➾  {directory}')
-		self.controller.locked_print()
-		self.controller.ask_to_continue()
 		found_files:List[str] = list()
 		for *root, files in os.walk(directory):
 			for file in files:
@@ -95,7 +92,7 @@ class FileWorker:
 		if not res:
 			reason = {
 				'message'  : 'Incoorect file path given!',
-				'reason'   : f'    {filename}' + '\n    ^'
+				'reason'   : f'{filename}' + '\n              ^'
 			}
 			self.controller.finish(**reason)
 		return True

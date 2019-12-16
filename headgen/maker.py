@@ -17,7 +17,7 @@ from headgen.string_worker import StringWorker
 
 class Maker:
 	def __init__(self,  flags, fileworker, controller):
-		self.flags = flags or {'protection_type' : 'ifndef'}
+		self.flags = flags or {'protection_type' : 'pragma'}
 		self.fileworker = fileworker
 		self.main_visitor = MainVisitor(controller)
 		self.controller = controller

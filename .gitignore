@@ -1,2 +1,4 @@
 push_package.sh
 .pypiric
+**/__pycache__/**
+__pycache__

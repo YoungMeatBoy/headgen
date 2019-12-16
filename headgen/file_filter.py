@@ -37,17 +37,10 @@ class FileFilter:
 			}
 			self.controller.finish(**reason)
 		else:
-			result:List = list()
+			result = list()
 			with open(file, 'r', encoding = 'utf-8') as opened_file:	
 				for line_ind, line in enumerate(opened_file):
-					try:
-						result.append(line.strip())
-					except Exception:
-						reason = {
-							'message' : 'Impossible to read all patterns from the file!',
-							'reason'  : f'Failed to compile line > {line} < on line {line_ind} in file {file}'
-						}
-						self.controller.finish(**reason)
+					result.append(line.strip())
 			return result
 
 	'''
@@ -74,7 +67,7 @@ class FileFilter:
 			files = self.cache_files
 		else:
 			files = self.find_files(directory)
-		result:List[str] = list()
+		result = list()
 		for file in files:
 			if filtering_filename in file:
 				result.append(file)

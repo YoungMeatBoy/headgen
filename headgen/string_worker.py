@@ -38,7 +38,7 @@ class StringWorker:
 					 'end' : f'#endif /* {filename} */'},
 		'pragma' : {'start' : '#pragma once\n',
 					'end' : '\n'}
-  		}
+		}
 		return res
 	
 	def get_info(self, filename, functions, structures, enums):
