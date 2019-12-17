@@ -15,7 +15,6 @@
 import os
 import re
 from itertools import islice
-from pycparser import c_ast, parse_file
 from typing import List
 
 

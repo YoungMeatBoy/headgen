@@ -1,6 +1,5 @@
 from headgen.helper_visitor import HelperVisitor
 from headgen.key_parser import KeyParser
-from pycparser import c_ast
 from typing import List
 import re
 
@@ -16,7 +15,7 @@ def get_function_name(line):
 
 
 
-class MainVisitor(c_ast.NodeVisitor, HelperVisitor):
+class MainVisitor(HelperVisitor):
 	def __init__(self, controller):
 		self.key_parser = KeyParser()
 		self.controller = controller
