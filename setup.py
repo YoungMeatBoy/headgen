@@ -10,5 +10,5 @@ setup(
 	author='Miasnenko Dmitry',
 	author_email='d2ms2nk@gmail.com',
 	url='https://github.com/YoungMeatBoy/headgen.git',
-	install_requires = ['ansicolors', 'colorama', 'fnmatch', ]
+	install_requires = ['ansicolors', 'colorama']
 )
