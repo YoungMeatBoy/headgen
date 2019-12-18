@@ -20,7 +20,7 @@ class MainVisitor(HelperVisitor):
 		self.key_parser = KeyParser()
 		self.controller = controller
 		self.function_pattern = re.compile(r'\w{0,}\s?\w{0,}\s?[*]?(\w.*)[(]((\w*)\s?[*]\s?(\w*))*[)]\s?{?')
-		self.include_pattern = re.compile(r'(loc|std)?\s*[:]\s*\w{1,}[.][h]')
+		self.include_pattern = re.compile(r'(loc|std)?\s*[:]\s*.*')
 
 	'''
 	@brief Checks if line is a function
