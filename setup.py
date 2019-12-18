@@ -1,11 +1,8 @@
 from setuptools import setup, find_packages
 
-
-
-
 setup(
 	name='headgen',
-	version='2.2.5',
+	version='2.2.6',
 	packages=find_packages(),
 	author='Miasnenko Dmitry',
 	author_email='d2ms2nk@gmail.com',
