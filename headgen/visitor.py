@@ -19,7 +19,7 @@ class MainVisitor(HelperVisitor):
 	def __init__(self, controller):
 		self.key_parser = KeyParser()
 		self.controller = controller
-		self.function_pattern = re.compile(r'^\w{1,}\s?\w{1,}\s?[*]?(\w*)[(]((.)*\s?[*]\s?(.)*){0,}[)]\s?{?(.)*$')
+		self.function_pattern = re.compile(r'^\w{1,}\s?\w{1,}\s?[*]?(\w*)[(](void|((.)*\s?[*]\s?(.)*)){0,}[)]\s?{?(.)*$')
 		self.include_pattern = re.compile(r'(loc|std)?\s*[:]\s*.*')
 
 	'''
