@@ -19,7 +19,7 @@ class MainVisitor(HelperVisitor):
 	def __init__(self, controller):
 		self.key_parser = KeyParser()
 		self.controller = controller
-		self.function_pattern = re.compile(r'\w{0,}\s?\w{0,}\s?[*]?(\w.*)[(]((.)*\s?[*]\s?(.)*){0,}[)]\s?{?')
+		self.function_pattern = re.compile(r'^\w{1,}\s?\w{1,}\s?[*]?(\w*)[(]((.)*\s?[*]\s?(.)*){0,}[)]\s?{?(.)*$')
 		self.include_pattern = re.compile(r'(loc|std)?\s*[:]\s*.*')
 
 	'''
@@ -45,7 +45,7 @@ class MainVisitor(HelperVisitor):
 	'''
 	def get_functions(self, filename:str) -> List[dict]:
 		result = list()
-		with open(filename) as opened_file:
+		with open(filename, encoding = "utf-8") as opened_file:
 			for ind, line in enumerate(opened_file):
 				if self.__is_function__(line) and self.__not_ignored__(line):
 					name = get_function_name(line)
@@ -64,7 +64,7 @@ class MainVisitor(HelperVisitor):
 	@return list of functions linked with documentation
 	'''
 	def get_documentation(self, filename:str, functions:List[dict]):
-		with open(filename) as opened_file:
+		with open(filename, encoding = "utf-8") as opened_file:
 			for ind, line in enumerate(opened_file):
 				keys = self.key_parser.get_keys_of(line, 'headgen', 'link')
 				no_keys_line = self.key_parser.remove_keys_from_line(line)
@@ -99,7 +99,7 @@ class MainVisitor(HelperVisitor):
 	def get_includes(self, filename:str):
 		res = list()	
 		sort_flag = False
-		with open(filename) as opened_file:
+		with open(filename, encoding = "utf-8") as opened_file:
 			for line_ind, line in enumerate(opened_file):
 				keys_includes = self.key_parser.get_keys_of(line, 'headgen', 'includes')
 				keys_sort = self.key_parser.get_keys_of(line, 'headgen', 'sort')
@@ -128,7 +128,7 @@ class MainVisitor(HelperVisitor):
 	def get_defines(self, file:str):
 		before = list()
 		after = list()
-		with open(file, 'r') as opened_file:
+		with open(file, 'r', encoding = "utf-8") as opened_file:
 			for line in opened_file:
 				if '#define' in line:
 					add_flag = not self.key_parser.get_keys_of(line, 'headgen', 'no_add')
@@ -143,7 +143,7 @@ class MainVisitor(HelperVisitor):
 
 	def get_enums(self, file):
 		res = []
-		with open(file, 'r') as opened_file:
+		with open(file, 'r', encoding = "utf-8") as opened_file:
 			for ind, line in enumerate(opened_file):
 				watch = self.key_parser.get_keys_of(line, 'headgen', 'watch')
 				line_num = ind
@@ -169,7 +169,7 @@ class MainVisitor(HelperVisitor):
 
 	def get_structures(self, file):
 		res = []
-		with open(file, 'r') as opened_file:
+		with open(file, 'r', encoding = "utf-8") as opened_file:
 			for ind, line in enumerate(opened_file):
 				watch = self.key_parser.get_keys_of(line, 'headgen', 'watch')
 				line_num = ind
@@ -192,3 +192,12 @@ class MainVisitor(HelperVisitor):
 								self.controller.finish(**reason)
 						res.append(st)
 		return res
+
+
+	def test_function_regexp(self, files):
+		for file in files:
+			print(f"TESTING : {file}")
+			with open(file, 'r', encoding = "utf-8") as opened_file:
+				for line in opened_file:
+					if re.match(self.function_pattern, line):
+							print(f"MATCHED: {line}")

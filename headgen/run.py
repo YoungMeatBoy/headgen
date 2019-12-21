@@ -6,6 +6,7 @@ from pprint import pprint
 from headgen.file_worker import FileWorker
 from headgen.controller import Controller
 from headgen.file_filter import FileFilter 
+from headgen.visitor import MainVisitor
 from headgen.maker import Maker
 from colors import *
 from colorama import init
@@ -20,6 +21,9 @@ parser.add_argument("-a"  , "--ask"              , help = "Wу will ask you befo
 parser.add_argument("-f"  , "--file"             , help = "Path to the file for which you want to create a header.",                       required = False, default = "")
 parser.add_argument("-d"  , "--dir"              , help = "Directory of file searching.",                                                  required = False, default = "")
 parser.add_argument("-dp" , "--disable_printing" , help = "Should we print info?",                                  action = "store_true", required = False, default = False)
+parser.add_argument("-test", action = "store_true", required = False, default = False)
+
+
 
 args = parser.parse_args()
 
@@ -57,6 +61,9 @@ else:
 	if not files:
 		controller.finish('Impossible to find *.c files!',
 							'No files in this directory!')
+	if args.test:
+		MainVisitor(controller).test_function_regexp(files)
+		exit()
 	else:
 		controller.locked_print(cyan('found source files'))
 		for file in files:

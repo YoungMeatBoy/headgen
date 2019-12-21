@@ -54,7 +54,7 @@ class Maker:
 		info = self.string_worker.get_info(file, functions, structures, enums)
 
 
-		with open(header_path, 'w') as header:
+		with open(header_path, 'w', encoding = "utf-8") as header:
 			# writing info
 			header.write(info)
 
