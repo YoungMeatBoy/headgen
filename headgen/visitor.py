@@ -19,7 +19,7 @@ class MainVisitor(HelperVisitor):
 	def __init__(self, controller):
 		self.key_parser = KeyParser()
 		self.controller = controller
-		self.function_pattern = re.compile(r'^(\w{1,}\s?)*[*]?\s?(\w{1,})[(](void|((.)*\s?[*]\s?(.)*))*[)]\s?{?(.)*$')
+		self.function_pattern = re.compile(r'^(\w{1,}\s?)+[*]?\s?(\w{1,})[(](void|((.)*\s?[*]*\s?(.)*))*[)](.)*')
 		self.include_pattern = re.compile(r'(loc|std)?\s*[:]\s*.*')
 
 	'''
@@ -196,7 +196,7 @@ class MainVisitor(HelperVisitor):
 
 	def test_function_regexp(self, files):
 		for file in files:
-			print(f"TESTING : {file}")
+			print(f"TESTING : {file}\n")
 			with open(file, 'r', encoding = "utf-8") as opened_file:
 				for line in opened_file:
 					if re.match(self.function_pattern, line):

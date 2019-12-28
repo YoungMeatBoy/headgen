@@ -41,6 +41,11 @@ maker = Maker(maker_flags, fileworker, controller)
 if args.file:
 	# Checking if file
 	# path is correct
+	
+	if args.test:
+		MainVisitor(controller).test_function_regexp([args.file])
+		exit()
+ 
 	if fileworker.accept_file(args.file):
 		controller.locked_print(cyan('processing'), magenta(f'     {args.file}'))
 

@@ -101,7 +101,7 @@ loc: mylib.h
 
 // or if you want to sort imports
 
-/* headgen::includes:: headgen::sort::enable
+/* headgen::includes headgen::sort::enable
 std: stdio.h
 std: string.h
 loc: mylib.h
@@ -147,11 +147,11 @@ std: stdio.h
 */
 
 // This define will not be added to a header
-#define Hello 1 //headgen::no_add::
+//#define Hello 1 //headgen::no_add
 
-#define IM_PLACED_AFTER_INCLUDES 0
+//#define IM_PLACED_AFTER_INCLUDES 0
 
-#define IM_PLACED_BEFORE_INCLUDES 1 //headgen::place_before::includes
+//#define IM_PLACED_BEFORE_INCLUDES 1 //headgen::place_before::includes
 
 ```
 Generated header

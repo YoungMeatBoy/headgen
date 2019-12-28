@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
 	name='headgen',
-	version='2.3.3',
+	version='2.3.4',
 	packages=find_packages(),
 	author='Miasnenko Dmitry',
 	author_email='d2ms2nk@gmail.com',

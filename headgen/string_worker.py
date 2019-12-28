@@ -1,21 +1,3 @@
-'''
-
-			  [DESCRIPTION]
-		 This file keeps help functions
-	
-				[CREATORS]
-			 Name: Miasnenko Dmitry
-	GitHub: https://github.com/YoungMeatBoy 
-
-					REWRITE!
-					REWRITE!
-					REWRITE!
-					REWRITE!
-					REWRITE!
-					REWRITE!
-					REWRITE!
-					REWRITE!
-'''
 
 from headgen.controller import Controller
 import os
@@ -26,8 +8,6 @@ def info_get_functions_names(functions):
 		name = func["name"]
 		res += f"    {i + 1} > {name}\n"
 	return res
-
-
 
 
 class StringWorker:
